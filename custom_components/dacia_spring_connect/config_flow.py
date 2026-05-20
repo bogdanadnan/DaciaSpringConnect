@@ -7,6 +7,7 @@ from typing import Any
 
 import aiohttp
 import voluptuous as vol
+from renault_api.gigya.exceptions import InvalidCredentialsException
 from renault_api.renault_client import RenaultClient
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
@@ -63,9 +64,9 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            self._username = user_input[CONF_USERNAME]
-            self._password = user_input[CONF_PASSWORD]
-            self._locale = user_input.get(CONF_LOCALE, DEFAULT_LOCALE)
+            self._username = user_input[CONF_USERNAME].strip()
+            self._password = user_input[CONF_PASSWORD].strip()
+            self._locale = user_input.get(CONF_LOCALE, DEFAULT_LOCALE).strip()
 
             try:
                 websession = async_get_clientsession(self.hass)
@@ -81,6 +82,8 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
                     errors["base"] = "no_accounts"
                 else:
                     return await self.async_step_account()
+            except InvalidCredentialsException:
+                errors["base"] = "invalid_auth"
             except aiohttp.ClientError:
                 errors["base"] = "cannot_connect"
             except Exception:  # noqa: BLE001
