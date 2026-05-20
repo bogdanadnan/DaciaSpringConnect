@@ -139,7 +139,11 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
         bs = data.battery_status
 
         if self._stop_requested_at is not None:
-            car_stopped = bs.chargingStatus is None or float(bs.chargingStatus) == 0
+            # chargingStatus > 0  → actively charging (stop not yet applied)
+            # chargingStatus == 0 → cleanly stopped
+            # chargingStatus < 0  → error/stopped (e.g. -1.0 = "charge error" reported by car after a stop command)
+            # Any non-positive value means the car is no longer charging.
+            car_stopped = bs.chargingStatus is None or float(bs.chargingStatus) <= 0
             timed_out = datetime.now(UTC) - self._stop_requested_at > STOP_COMMAND_TIMEOUT
             if car_stopped:
                 _LOGGER.debug(

@@ -216,7 +216,7 @@ async def test_charge_limit_re_arms_after_car_stops(
     await hass.async_block_till_done()
     assert mock_vehicle.set_charge_stop.await_count == 1
 
-    # Car confirms it stopped
+    # Car confirms it stopped (chargingStatus = 0)
     battery_mock.chargingStatus = 0.0
     await coordinator.async_refresh()
     await hass.async_block_till_done()
@@ -228,6 +228,35 @@ async def test_charge_limit_re_arms_after_car_stops(
     await coordinator.async_refresh()
     await hass.async_block_till_done()
     # Enforcement re-armed and fires again
+    assert mock_vehicle.set_charge_stop.await_count == 2
+
+
+async def test_charge_limit_re_arms_after_car_reports_error_status(
+    hass: HomeAssistant, setup_integration, mock_vehicle
+):
+    """chargingStatus=-1.0 (charge error) counts as stopped; flag clears immediately."""
+    entry_id = setup_integration.entry_id
+    coordinator = hass.data[DOMAIN][entry_id][DATA_COORDINATOR]
+
+    battery_mock = mock_vehicle.get_battery_status.return_value
+    battery_mock.batteryLevel = 85
+
+    # Stop issued
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+    assert mock_vehicle.set_charge_stop.await_count == 1
+
+    # Car reports chargingStatus=-1.0 (charge error) rather than 0
+    battery_mock.chargingStatus = -1.0
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+    # Flag should clear — -1 counts as stopped, no retry
+    assert mock_vehicle.set_charge_stop.await_count == 1
+
+    # User restarts charging manually
+    battery_mock.chargingStatus = 1.0
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
     assert mock_vehicle.set_charge_stop.await_count == 2
 
 
