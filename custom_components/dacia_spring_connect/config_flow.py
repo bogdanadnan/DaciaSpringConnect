@@ -69,6 +69,15 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
             self._locale = user_input.get(CONF_LOCALE, DEFAULT_LOCALE).strip()
 
             try:
+                _LOGGER.debug(
+                    "Attempting login: username=%r, locale=%r, password_len=%d, "
+                    "password_first=%r, password_last=%r",
+                    self._username,
+                    self._locale,
+                    len(self._password),
+                    self._password[:1] if self._password else "",
+                    self._password[-1:] if self._password else "",
+                )
                 websession = async_get_clientsession(self.hass)
                 client = RenaultClient(websession=websession, locale=self._locale)
                 await client.session.login(self._username, self._password)
