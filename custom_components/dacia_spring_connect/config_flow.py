@@ -7,6 +7,7 @@ from typing import Any
 
 import aiohttp
 import voluptuous as vol
+from renault_api.const import AVAILABLE_LOCALES
 from renault_api.gigya.exceptions import InvalidCredentialsException
 from renault_api.renault_client import RenaultClient
 
@@ -28,11 +29,13 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+_LOCALE_OPTIONS = {locale: locale for locale in sorted(AVAILABLE_LOCALES)}
+
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
-        vol.Optional(CONF_LOCALE, default=DEFAULT_LOCALE): str,
+        vol.Optional(CONF_LOCALE, default=DEFAULT_LOCALE): vol.In(_LOCALE_OPTIONS),
     }
 )
 

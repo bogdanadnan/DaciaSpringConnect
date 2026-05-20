@@ -6,7 +6,7 @@
                 "data": {
                     "username": "Email address",
                     "password": "Password",
-                    "locale": "Locale (e.g. fr_FR, en_GB)"
+                    "locale": "Locale"
                 }
             },
             "account": {
