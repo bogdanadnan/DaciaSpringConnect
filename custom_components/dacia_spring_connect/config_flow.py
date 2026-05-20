@@ -97,9 +97,11 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
                     errors["base"] = "no_accounts"
                 else:
                     return await self.async_step_account()
-            except InvalidCredentialsException:
+            except InvalidCredentialsException as exc:
+                _LOGGER.warning("Gigya login rejected: %s", exc)
                 errors["base"] = "invalid_auth"
-            except aiohttp.ClientError:
+            except aiohttp.ClientError as exc:
+                _LOGGER.warning("Network error during login: %s", exc)
                 errors["base"] = "cannot_connect"
             except Exception:  # noqa: BLE001
                 _LOGGER.exception("Unexpected error during login")
