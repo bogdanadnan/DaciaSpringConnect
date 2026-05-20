@@ -52,7 +52,6 @@ _patch_gigya_keys()
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
-    Platform.CLIMATE,
     Platform.DEVICE_TRACKER,
     Platform.NUMBER,
     Platform.SELECT,

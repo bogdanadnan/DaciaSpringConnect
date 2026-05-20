@@ -1,4 +1,4 @@
-"""Tests for sensor, binary_sensor, climate, select, button, device_tracker, and number entities."""
+"""Tests for sensor, binary_sensor, select, button, device_tracker, and number entities."""
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -40,6 +40,14 @@ async def test_charge_status_sensor(hass: HomeAssistant, setup_integration):
     state = hass.states.get(f"sensor.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charge_status")
     assert state is not None
     assert state.state == "charge_in_progress"
+
+
+async def test_external_temperature_sensor(hass: HomeAssistant, setup_integration):
+    """External temperature sensor should reflect hvac_status.externalTemperature."""
+    state = hass.states.get(f"sensor.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_exterior_temperature")
+    assert state is not None
+    # externalTemperature is None in the default mock → sensor reports unknown
+    assert state.state == "unknown"
 
 
 # ---------------------------------------------------------------------------
@@ -92,33 +100,18 @@ async def test_charge_mode_select_change(hass: HomeAssistant, setup_integration,
 
 
 # ---------------------------------------------------------------------------
-# Climate
+# Button
 # ---------------------------------------------------------------------------
 
-async def test_climate_hvac_mode_off(hass: HomeAssistant, setup_integration):
-    """HVAC should be off when hvacStatus is 'off'."""
-    state = hass.states.get(f"climate.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_pre_conditioning")
-    assert state is not None
-    assert state.state == "off"
-
-
-async def test_climate_turn_on(hass: HomeAssistant, setup_integration, mock_vehicle):
-    """Turning on climate should call set_ac_start."""
+async def test_hvac_start_button(hass: HomeAssistant, setup_integration, mock_vehicle):
+    """Pressing the pre-conditioning button should call set_ac_start."""
     await hass.services.async_call(
-        "climate",
-        "set_hvac_mode",
-        {
-            "entity_id": f"climate.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_pre_conditioning",
-            "hvac_mode": "heat_cool",
-        },
+        "button",
+        "press",
+        {"entity_id": f"button.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_start_pre_conditioning"},
         blocking=True,
     )
     mock_vehicle.set_ac_start.assert_awaited_once()
-
-
-# ---------------------------------------------------------------------------
-# Button
-# ---------------------------------------------------------------------------
 
 async def test_charge_start_button(hass: HomeAssistant, setup_integration, mock_vehicle):
     """Pressing the charge start button should call set_charge_start."""

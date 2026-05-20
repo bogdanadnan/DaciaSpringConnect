@@ -99,6 +99,9 @@
             },
             "mileage": {
                 "name": "Kilométrage"
+            },
+            "external_temperature": {
+                "name": "Température extérieure"
             }
         },
         "binary_sensor": {
@@ -110,11 +113,6 @@
             },
             "hvac_active": {
                 "name": "Préconditionnement actif"
-            }
-        },
-        "climate": {
-            "hvac": {
-                "name": "Préconditionnement"
             }
         },
         "device_tracker": {
@@ -138,6 +136,9 @@
             }
         },
         "button": {
+            "hvac_start": {
+                "name": "Démarrer le préconditionnement"
+            },
             "charge_start": {
                 "name": "Démarrer la charge"
             },

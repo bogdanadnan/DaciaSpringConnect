@@ -4,6 +4,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+# The Dacia Spring ignores targetTemperature. We pass this constant because the
+# Kamereon API requires the field, but the car starts at its own fixed setpoint.
+_HVAC_API_TEMP = 21.0
+
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -22,6 +26,11 @@ class DaciaSpringConnectButtonDescription(ButtonEntityDescription):
 
 
 BUTTON_DESCRIPTIONS: tuple[DaciaSpringConnectButtonDescription, ...] = (
+    DaciaSpringConnectButtonDescription(
+        key="hvac_start",
+        translation_key="hvac_start",
+        press_fn=lambda coordinator: coordinator.async_set_hvac("start", _HVAC_API_TEMP),
+    ),
     DaciaSpringConnectButtonDescription(
         key="charge_start",
         translation_key="charge_start",
