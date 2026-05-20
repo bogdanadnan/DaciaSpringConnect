@@ -42,12 +42,6 @@ async def test_charge_status_sensor(hass: HomeAssistant, setup_integration):
     assert state.state == "charge_in_progress"
 
 
-async def test_external_temperature_sensor(hass: HomeAssistant, setup_integration):
-    """External temperature sensor should reflect hvac_status.externalTemperature."""
-    state = hass.states.get(f"sensor.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_exterior_temperature")
-    assert state is not None
-    # externalTemperature is None in the default mock → sensor reports unknown
-    assert state.state == "unknown"
 
 
 # ---------------------------------------------------------------------------

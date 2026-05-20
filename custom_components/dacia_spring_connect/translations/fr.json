@@ -99,9 +99,6 @@
             },
             "mileage": {
                 "name": "Kilométrage"
-            },
-            "external_temperature": {
-                "name": "Température extérieure"
             }
         },
         "binary_sensor": {

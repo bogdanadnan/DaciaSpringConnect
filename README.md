@@ -11,7 +11,6 @@ A custom [Home Assistant](https://www.home-assistant.io/) integration for the **
 | `sensor` | Charging Remaining Time | Minutes to full charge |
 | `sensor` | Charge Status | Current charging state |
 | `sensor` | Mileage | Total odometer reading (km) |
-| `sensor` | Exterior Temperature | Outside temperature reported by the car (°C) |
 | `binary_sensor` | Plugged In | Whether the cable is connected |
 | `binary_sensor` | Charging | Whether the battery is actively charging |
 | `binary_sensor` | Pre-conditioning Active | Whether HVAC is running |

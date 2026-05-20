@@ -99,9 +99,6 @@
             },
             "mileage": {
                 "name": "Mileage"
-            },
-            "external_temperature": {
-                "name": "Exterior Temperature"
             }
         },
         "binary_sensor": {
