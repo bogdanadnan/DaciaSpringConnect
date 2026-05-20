@@ -67,12 +67,6 @@
             "battery_autonomy": {
                 "name": "Battery Autonomy"
             },
-            "battery_available_energy": {
-                "name": "Available Energy"
-            },
-            "charging_power": {
-                "name": "Charging Power"
-            },
             "charging_remaining_time": {
                 "name": "Charging Remaining Time"
             },
@@ -80,7 +74,7 @@
                 "name": "Charge Status",
                 "state": {
                     "not_in_charge": "Not charging",
-                    "waiting_for_planned_charge": "Waiting for planned charge",
+                    "waiting_for_a_planned_charge": "Waiting for planned charge",
                     "charge_ended": "Charge ended",
                     "waiting_for_current_charge": "Waiting for charge",
                     "energy_flap_opened": "Energy flap opened",
@@ -88,9 +82,6 @@
                     "charge_error": "Charge error",
                     "unavailable": "Unavailable"
                 }
-            },
-            "hvac_exterior_temperature": {
-                "name": "Exterior Temperature"
             },
             "mileage": {
                 "name": "Mileage"

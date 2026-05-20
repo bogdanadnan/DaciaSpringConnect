@@ -61,19 +61,19 @@ def _make_battery_status() -> MagicMock:
     m = MagicMock()
     m.batteryLevel = 75
     m.batteryAutonomy = 180
-    m.batteryAvailableEnergy = 18.5
-    m.chargingInstantaneousPower = 3700
     m.chargingRemainingTime = 65
     m.plugStatus = 1
-    m.chargingStatus = MagicMock()
-    m.chargingStatus.name = "CHARGE_IN_PROGRESS"
+    m.chargingStatus = 1.0
+    charging_state = MagicMock()
+    charging_state.name = "CHARGE_IN_PROGRESS"
+    m.get_charging_status = MagicMock(return_value=charging_state)
     return m
 
 
 def _make_hvac_status() -> MagicMock:
     m = MagicMock()
     m.hvacStatus = "off"
-    m.externalTemperature = 18.5
+    m.externalTemperature = None
     return m
 
 

@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfLength, UnitOfPower, UnitOfTemperature
+from homeassistant.const import PERCENTAGE, UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -53,30 +53,6 @@ SENSOR_DESCRIPTIONS: tuple[DaciaSpringConnecteSensorDescription, ...] = (
         ),
     ),
     DaciaSpringConnecteSensorDescription(
-        key="battery_available_energy",
-        translation_key="battery_available_energy",
-        device_class=SensorDeviceClass.ENERGY_STORAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        value_fn=lambda data: (
-            data.battery_status.batteryAvailableEnergy
-            if data.battery_status
-            else None
-        ),
-    ),
-    DaciaSpringConnecteSensorDescription(
-        key="charging_power",
-        translation_key="charging_power",
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfPower.WATT,
-        value_fn=lambda data: (
-            data.battery_status.chargingInstantaneousPower
-            if data.battery_status
-            else None
-        ),
-    ),
-    DaciaSpringConnecteSensorDescription(
         key="charging_remaining_time",
         translation_key="charging_remaining_time",
         device_class=SensorDeviceClass.DURATION,
@@ -92,24 +68,12 @@ SENSOR_DESCRIPTIONS: tuple[DaciaSpringConnecteSensorDescription, ...] = (
         key="charge_status",
         translation_key="charge_status",
         device_class=SensorDeviceClass.ENUM,
-        options=["not_in_charge", "waiting_for_planned_charge", "charge_ended",
+        options=["not_in_charge", "waiting_for_a_planned_charge", "charge_ended",
                  "waiting_for_current_charge", "energy_flap_opened", "charge_in_progress",
                  "charge_error", "unavailable"],
         value_fn=lambda data: (
-            str(data.battery_status.chargingStatus.name).lower()
-            if data.battery_status and data.battery_status.chargingStatus is not None
-            else None
-        ),
-    ),
-    DaciaSpringConnecteSensorDescription(
-        key="hvac_exterior_temperature",
-        translation_key="hvac_exterior_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: (
-            data.hvac_status.externalTemperature
-            if data.hvac_status
+            cs.name.lower()
+            if data.battery_status and (cs := data.battery_status.get_charging_status()) is not None
             else None
         ),
     ),

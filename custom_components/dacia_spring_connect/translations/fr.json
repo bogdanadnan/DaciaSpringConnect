@@ -67,12 +67,6 @@
             "battery_autonomy": {
                 "name": "Autonomie batterie"
             },
-            "battery_available_energy": {
-                "name": "Énergie disponible"
-            },
-            "charging_power": {
-                "name": "Puissance de charge"
-            },
             "charging_remaining_time": {
                 "name": "Temps de charge restant"
             },
@@ -80,7 +74,7 @@
                 "name": "Statut de charge",
                 "state": {
                     "not_in_charge": "Pas en charge",
-                    "waiting_for_planned_charge": "En attente de charge planifiée",
+                    "waiting_for_a_planned_charge": "En attente de charge planifiée",
                     "charge_ended": "Charge terminée",
                     "waiting_for_current_charge": "En attente de charge",
                     "energy_flap_opened": "Trappe ouverte",
@@ -88,9 +82,6 @@
                     "charge_error": "Erreur de charge",
                     "unavailable": "Non disponible"
                 }
-            },
-            "hvac_exterior_temperature": {
-                "name": "Température extérieure"
             },
             "mileage": {
                 "name": "Kilométrage"

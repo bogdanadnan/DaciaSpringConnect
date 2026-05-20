@@ -41,8 +41,8 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[DaciaSpringConnectBinarySensorDescription, ...
         translation_key="charging",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         value_fn=lambda data: (
-            data.battery_status.chargingStatus is not None
-            and str(data.battery_status.chargingStatus.name).lower() == "charge_in_progress"
+            (cs := data.battery_status.get_charging_status()) is not None
+            and cs.name.lower() == "charge_in_progress"
             if data.battery_status
             else None
         ),
