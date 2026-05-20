@@ -15,6 +15,16 @@ from homeassistant.const import PERCENTAGE, UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+
+def _format_minutes(minutes: int | None) -> str | None:
+    """Convert a minute count to a human-readable string, e.g. 90 → '1h 30m'."""
+    if minutes is None:
+        return None
+    if minutes < 60:
+        return f"{minutes}m"
+    hours, mins = divmod(minutes, 60)
+    return f"{hours}h {mins}m" if mins else f"{hours}h"
+
 from .const import DATA_COORDINATOR, DOMAIN
 from .coordinator import DaciaSpringConnectCoordinator, DaciaSpringConnectData
 from .entity import DaciaSpringConnectEntity
@@ -55,11 +65,9 @@ SENSOR_DESCRIPTIONS: tuple[DaciaSpringConnecteSensorDescription, ...] = (
     DaciaSpringConnecteSensorDescription(
         key="charging_remaining_time",
         translation_key="charging_remaining_time",
-        device_class=SensorDeviceClass.DURATION,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="min",
+        icon="mdi:timer-outline",
         value_fn=lambda data: (
-            data.battery_status.chargingRemainingTime
+            _format_minutes(data.battery_status.chargingRemainingTime)
             if data.battery_status
             else None
         ),

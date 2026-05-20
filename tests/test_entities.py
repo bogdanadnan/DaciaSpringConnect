@@ -8,8 +8,26 @@ import pytest
 from homeassistant.core import HomeAssistant
 
 from custom_components.dacia_spring_connect.const import DATA_COORDINATOR, DOMAIN
+from custom_components.dacia_spring_connect.sensor import _format_minutes
 
 from .conftest import MOCK_VIN
+
+
+# ---------------------------------------------------------------------------
+# _format_minutes unit tests
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("minutes,expected", [
+    (0,   "0m"),
+    (45,  "45m"),
+    (60,  "1h"),
+    (65,  "1h 5m"),
+    (90,  "1h 30m"),
+    (120, "2h"),
+    (None, None),
+])
+def test_format_minutes(minutes, expected):
+    assert _format_minutes(minutes) == expected
 
 
 # ---------------------------------------------------------------------------
@@ -40,6 +58,13 @@ async def test_charge_status_sensor(hass: HomeAssistant, setup_integration):
     state = hass.states.get(f"sensor.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charge_status")
     assert state is not None
     assert state.state == "charge_in_progress"
+
+
+async def test_charging_remaining_time_sensor(hass: HomeAssistant, setup_integration):
+    """Charging remaining time should be formatted (conftest sets 65 min → '1h 5m')."""
+    state = hass.states.get(f"sensor.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charging_remaining_time")
+    assert state is not None
+    assert state.state == "1h 5m"
 
 
 
