@@ -5,9 +5,9 @@
         "@bogdanadnan"
     ],
     "config_flow": true,
-    "documentation": "https://github.com/bogdanadnan/daciaspring",
+    "documentation": "https://github.com/bogdanadnan/DaciaSpringConnect",
     "iot_class": "cloud_polling",
-    "issue_tracker": "https://github.com/bogdanadnan/daciaspring/issues",
+    "issue_tracker": "https://github.com/bogdanadnan/DaciaSpringConnect/issues",
     "requirements": [
         "renault-api==0.5.9"
     ],
