@@ -11,15 +11,24 @@ A custom [Home Assistant](https://www.home-assistant.io/) integration for the **
 | `sensor` | Charging Remaining Time | Minutes to full charge |
 | `sensor` | Charge Status | Current charging state |
 | `sensor` | Mileage | Total odometer reading (km) |
+| `sensor` | Exterior Temperature | Outside temperature reported by the car (°C) |
 | `binary_sensor` | Plugged In | Whether the cable is connected |
 | `binary_sensor` | Charging | Whether the battery is actively charging |
 | `binary_sensor` | Pre-conditioning Active | Whether HVAC is running |
-| `climate` | Pre-conditioning | Start/stop cabin pre-conditioning with target temperature |
 | `device_tracker` | Location | Live GPS position |
 | `number` | Charge Limit | Auto-stop charging at this battery % (50–100, step 5) |
+| `button` | Start Pre-conditioning | Start cabin pre-conditioning (car stops automatically after ~10 min) |
 | `button` | Start Charging | Trigger an immediate charge start |
 | `button` | Stop Charging | Trigger an immediate charge stop |
 | `button` | Refresh Location | Force a GPS location update |
+
+### Charge Limit
+
+The **Charge Limit** entity monitors battery level on every coordinator refresh and automatically sends a charge-stop command when the configured percentage is reached. Additional behaviours:
+
+- If the limit is **raised** above the current battery level while the cable is connected and the car is not charging (e.g. it was stopped at the previous limit), charging restarts automatically.
+- A duplicate-command guard prevents re-sending the stop while the car is still acknowledging it. If the car does not confirm within 10 minutes the command is retried.
+- The configured limit is persisted across Home Assistant restarts.
 
 ## Installation
 
