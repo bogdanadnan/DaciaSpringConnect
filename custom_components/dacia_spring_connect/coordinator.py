@@ -99,9 +99,21 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
             return
         await self._client.session.login(self._username, self._password)
 
-    async def _async_fetch_all_data(self) -> DaciaSpringConnectData:
-        """Fetch every vehicle endpoint; propagates auth errors, silences unsupported ones."""
+    async def _async_fetch_all_data(
+        self, previous: DaciaSpringConnectData | None = None
+    ) -> DaciaSpringConnectData:
+        """Fetch every vehicle endpoint; propagates auth errors, keeps last value on transient failures."""
         data = DaciaSpringConnectData()
+        # Pre-populate with the previous values so a transient failure on one
+        # endpoint doesn't wipe out its last-known state.
+        if previous is not None:
+            data.battery_status = previous.battery_status
+            data.hvac_status = previous.hvac_status
+            data.location = previous.location
+            data.charge_mode = previous.charge_mode
+            data.cockpit = previous.cockpit
+            data.hvac_settings = previous.hvac_settings
+
         endpoints: list[tuple[str, Any, str]] = [
             ("battery_status", self.vehicle.get_battery_status, "battery status"),
             ("hvac_status", self.vehicle.get_hvac_status, "HVAC status"),
@@ -113,8 +125,13 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
         for attr, getter, label in endpoints:
             try:
                 setattr(data, attr, await getter())
-            except aiohttp.ClientResponseError:
-                raise  # propagate auth errors to _async_update_data
+            except aiohttp.ClientResponseError as err:
+                if err.status in _AUTH_STATUSES:
+                    raise  # propagate to trigger reauthentication
+                _LOGGER.warning(
+                    "Transient error fetching %s (HTTP %s), keeping last known value",
+                    label, err.status,
+                )
             except Exception as err:  # noqa: BLE001
                 _LOGGER.debug("Could not fetch %s: %s", label, err)
         return data
@@ -132,14 +149,14 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
                 raise UpdateFailed(str(err)) from err
 
         try:
-            return await self._async_fetch_all_data()
+            return await self._async_fetch_all_data(self.data)
         except aiohttp.ClientResponseError as err:
             if err.status not in _AUTH_STATUSES:
                 raise UpdateFailed(str(err)) from err
             _LOGGER.debug("Auth error (%s), attempting token refresh", err.status)
             try:
                 await self._async_reauthenticate()
-                return await self._async_fetch_all_data()
+                return await self._async_fetch_all_data(self.data)
             except aiohttp.ClientResponseError as reauth_err:
                 if reauth_err.status in _AUTH_STATUSES:
                     raise ConfigEntryAuthFailed(
