@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE
+from homeassistant.const import PERCENTAGE, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -57,8 +57,13 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
         """Restore previous value and register the charge-limit enforcement callback."""
         await super().async_added_to_hass()
 
-        # Restore the last known limit across restarts
-        if (last_state := await self.async_get_last_state()) is not None:
+        # Restore the last known limit across restarts.
+        # Guard against "unavailable"/"unknown" — those are written when HA shuts
+        # down while the coordinator is stopped, not the actual user-set value.
+        if (
+            (last_state := await self.async_get_last_state()) is not None
+            and last_state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+        ):
             try:
                 self._attr_native_value = float(last_state.state)
             except (ValueError, TypeError):
