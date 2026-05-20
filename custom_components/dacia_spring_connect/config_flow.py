@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import logging
+import sys
+import importlib.metadata
 from collections.abc import Mapping
 from typing import Any
 
@@ -72,6 +74,18 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
             self._locale = user_input.get(CONF_LOCALE, DEFAULT_LOCALE).strip()
 
             try:
+                try:
+                    import certifi as _certifi
+                    _certifi_path = _certifi.where()
+                except ImportError:
+                    _certifi_path = "not installed (using system certs)"
+                _LOGGER.warning(
+                    "Login env: python=%s, renault-api=%s, aiohttp=%s, certifi=%s",
+                    sys.version.split()[0],
+                    importlib.metadata.version("renault-api"),
+                    importlib.metadata.version("aiohttp"),
+                    _certifi_path,
+                )
                 _LOGGER.warning(
                     "Attempting login: username=%r, locale=%r, password_len=%d, "
                     "password_first=%r, password_last=%r",
