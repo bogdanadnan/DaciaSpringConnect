@@ -8,26 +8,25 @@ A custom [Home Assistant](https://www.home-assistant.io/) integration for the **
 |---|---|---|
 | `sensor` | Battery Level | State of charge (%) |
 | `sensor` | Battery Autonomy | Remaining range (km) |
-| `sensor` | Available Energy | Usable energy (kWh) |
-| `sensor` | Charging Power | Instantaneous charge power (W) |
 | `sensor` | Charging Remaining Time | Minutes to full charge |
 | `sensor` | Charge Status | Current charging state |
-| `sensor` | Exterior Temperature | Outside temperature (°C) |
 | `sensor` | Mileage | Total odometer reading (km) |
 | `binary_sensor` | Plugged In | Whether the cable is connected |
 | `binary_sensor` | Charging | Whether the battery is actively charging |
 | `binary_sensor` | Pre-conditioning Active | Whether HVAC is running |
 | `climate` | Pre-conditioning | Start/stop cabin pre-conditioning with target temperature |
 | `device_tracker` | Location | Live GPS position |
-| `select` | Charge Mode | Switch between `always`, `always_charging`, `schedule_mode` |
+| `number` | Charge Limit | Auto-stop charging at this battery % (50–100, step 5) |
 | `button` | Start Charging | Trigger an immediate charge start |
+| `button` | Stop Charging | Trigger an immediate charge stop |
+| `button` | Refresh Location | Force a GPS location update |
 
 ## Installation
 
 ### HACS (recommended)
 
 1. Open HACS → **Integrations** → **⋮** → **Custom repositories**.
-2. Add `https://github.com/bogdanadnan/daciaspring` with category **Integration**.
+2. Add `https://github.com/bogdanadnan/DaciaSpringConnect` with category **Integration**.
 3. Search for *Dacia Spring Connect* and install.
 4. Restart Home Assistant.
 
