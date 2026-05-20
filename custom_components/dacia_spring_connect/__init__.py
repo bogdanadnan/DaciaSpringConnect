@@ -12,6 +12,43 @@ from .coordinator import DaciaSpringConnectCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+# Renault rotated their Gigya API keys on 2026-05-20. renault-api==0.5.9 ships
+# the fix, but HA may downgrade to 0.5.8 when the official Renault integration
+# (which still pins 0.5.8 in HA ≤2026.5.3) is also enabled.  This patch applies
+# the correct keys in-memory at import time so auth works regardless.
+_GIGYA_EU_KEY = "3_VgdkgtIRH3AdHvJm-cjV2ug2EFE0lxt0IJzMC4MFqZjFpn_GYFXVdNZ19L7wZX0N"
+_EU_LOCALES = frozenset({
+    "bg_BG", "cs_CZ", "da_DK", "de_DE", "de_CH", "en_GB", "en_IE",
+    "es_ES", "fi_FI", "fr_FR", "fr_BE", "fr_CH", "hr_HR", "hu_HU",
+    "it_IT", "it_CH", "nl_NL", "nl_BE", "no_NO", "pl_PL", "pt_PT",
+    "ro_RO", "ru_RU", "sk_SK", "sl_SI", "sv_SE",
+})
+
+
+def _patch_gigya_keys() -> None:
+    try:
+        import renault_api.const as _rc  # noqa: PLC0415
+    except ImportError:
+        return
+    patched = [
+        locale
+        for locale in _EU_LOCALES
+        if (entry := _rc.AVAILABLE_LOCALES.get(locale))
+        and entry.get("gigya-api-key") != _GIGYA_EU_KEY
+        and entry.update({"gigya-api-key": _GIGYA_EU_KEY}) is None  # side-effect
+    ]
+    if patched:
+        _LOGGER.warning(
+            "Patched stale Gigya API keys for %d locale(s): %s. "
+            "renault-api<0.5.9 was installed (official Renault integration pins 0.5.8). "
+            "Disable the official Renault integration or update HA to 2026.5.4+ to fix permanently.",
+            len(patched),
+            ", ".join(sorted(patched)),
+        )
+
+
+_patch_gigya_keys()
+
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
