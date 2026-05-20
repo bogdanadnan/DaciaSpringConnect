@@ -13,7 +13,7 @@ from renault_api.renault_client import RenaultClient
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from .coordinator import create_renault_session
 
 from .const import (
     CONF_ACCOUNT_ID,
@@ -78,10 +78,13 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
                     self._password[:1] if self._password else "",
                     self._password[-1:] if self._password else "",
                 )
-                websession = async_get_clientsession(self.hass)
-                client = RenaultClient(websession=websession, locale=self._locale)
-                await client.session.login(self._username, self._password)
-                person = await client.get_person()
+                websession = create_renault_session()
+                try:
+                    client = RenaultClient(websession=websession, locale=self._locale)
+                    await client.session.login(self._username, self._password)
+                    person = await client.get_person()
+                finally:
+                    await websession.close()
                 self._accounts = [
                     {"id": acc.accountId, "type": acc.accountType}
                     for acc in (person.accounts or [])
@@ -114,11 +117,14 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self._account_id = user_input[CONF_ACCOUNT_ID]
             try:
-                websession = async_get_clientsession(self.hass)
-                client = RenaultClient(websession=websession, locale=self._locale)
-                await client.session.login(self._username, self._password)
-                account = await client.get_api_account(self._account_id)
-                vehicles_response = await account.get_vehicles()
+                websession = create_renault_session()
+                try:
+                    client = RenaultClient(websession=websession, locale=self._locale)
+                    await client.session.login(self._username, self._password)
+                    account = await client.get_api_account(self._account_id)
+                    vehicles_response = await account.get_vehicles()
+                finally:
+                    await websession.close()
                 self._vehicles = [
                     {"vin": v.vin, "label": f"{v.vin}"}
                     for v in (vehicles_response.vehicleLinks or [])
@@ -189,14 +195,17 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
-                websession = async_get_clientsession(self.hass)
-                client = RenaultClient(
-                    websession=websession,
-                    locale=reauth_entry.data[CONF_LOCALE],
-                )
-                await client.session.login(
-                    user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
-                )
+                websession = create_renault_session()
+                try:
+                    client = RenaultClient(
+                        websession=websession,
+                        locale=reauth_entry.data[CONF_LOCALE],
+                    )
+                    await client.session.login(
+                        user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+                    )
+                finally:
+                    await websession.close()
                 return self.async_update_reload_and_abort(
                     reauth_entry,
                     data_updates={

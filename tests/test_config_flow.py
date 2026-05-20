@@ -22,6 +22,22 @@ from custom_components.dacia_spring_connect.const import (
 from .conftest import MOCK_ACCOUNT_ID, MOCK_PASSWORD, MOCK_USERNAME, MOCK_VIN
 
 
+@pytest.fixture(autouse=True)
+def mock_create_session():
+    """Prevent create_renault_session from opening real sockets during tests."""
+    fake_session = MagicMock()
+    fake_session.closed = False
+    fake_session.close = AsyncMock()
+    with patch(
+        "custom_components.dacia_spring_connect.config_flow.create_renault_session",
+        return_value=fake_session,
+    ), patch(
+        "custom_components.dacia_spring_connect.coordinator.create_renault_session",
+        return_value=fake_session,
+    ):
+        yield fake_session
+
+
 def _mock_person():
     person = MagicMock()
     account = MagicMock()
@@ -41,8 +57,20 @@ def _mock_vehicles():
 
 @pytest.fixture
 def mock_config_flow_client():
-    """Patch RenaultClient inside config_flow for the full flow."""
+    """Patch RenaultClient inside config_flow and coordinator for the full flow.
+
+    Also patches coordinator.RenaultClient so the entry-setup task that HA
+    schedules after async_create_entry completes doesn't open real sockets.
+    """
+    mock_coord_client = MagicMock()
+    mock_coord_client.session.login = AsyncMock()
+    mock_coord_account = AsyncMock()
+    mock_coord_account.get_api_vehicle = AsyncMock(return_value=AsyncMock())
+    mock_coord_client.get_api_account = AsyncMock(return_value=mock_coord_account)
     with patch(
+        "custom_components.dacia_spring_connect.coordinator.RenaultClient",
+        return_value=mock_coord_client,
+    ), patch(
         "custom_components.dacia_spring_connect.config_flow.RenaultClient", autospec=True
     ) as mock_cls:
         client = mock_cls.return_value

@@ -2,10 +2,23 @@
 from __future__ import annotations
 
 import logging
+import ssl
 from datetime import timedelta
 from typing import Any
 
 import aiohttp
+
+try:
+    import certifi
+    _SSL_CONTEXT: ssl.SSLContext = ssl.create_default_context(cafile=certifi.where())
+except ImportError:  # pragma: no cover
+    _SSL_CONTEXT = ssl.create_default_context()
+
+
+def create_renault_session() -> aiohttp.ClientSession:
+    """Create a dedicated aiohttp session with certifi SSL for the Renault API."""
+    connector = aiohttp.TCPConnector(ssl=_SSL_CONTEXT)
+    return aiohttp.ClientSession(connector=connector)
 from renault_api.renault_account import RenaultAccount
 from renault_api.renault_client import RenaultClient
 from renault_api.renault_vehicle import RenaultVehicle
@@ -40,13 +53,13 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
     def __init__(
         self,
         hass: HomeAssistant,
-        websession: aiohttp.ClientSession,
         username: str,
         password: str,
         locale: str,
         account_id: str,
         vin: str,
         scan_interval: int = DEFAULT_SCAN_INTERVAL,
+        websession: aiohttp.ClientSession | None = None,
     ) -> None:
         """Initialise the coordinator."""
         super().__init__(
@@ -55,7 +68,12 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
             name=DOMAIN,
             update_interval=timedelta(seconds=scan_interval),
         )
-        self._websession = websession
+        if websession is None:
+            self._websession = create_renault_session()
+            self._owns_session = True
+        else:
+            self._websession = websession
+            self._owns_session = False
         self._username = username
         self._password = password
         self._locale = locale
@@ -130,6 +148,11 @@ class DaciaSpringConnectCoordinator(DataUpdateCoordinator[DaciaSpringConnectData
                 raise UpdateFailed(str(reauth_err)) from reauth_err
         except Exception as err:
             raise UpdateFailed(str(err)) from err
+
+    async def async_close_session(self) -> None:
+        """Close the aiohttp session if it was created by this coordinator."""
+        if self._owns_session and not self._websession.closed:
+            await self._websession.close()
 
     async def async_set_hvac(self, action: str, temperature: float | None = None) -> None:
         """Send HVAC command to the vehicle."""
