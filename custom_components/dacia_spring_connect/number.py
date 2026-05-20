@@ -76,6 +76,11 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the configured charge limit."""
+        _LOGGER.debug(
+            "Charge limit updated: %.0f%% → %.0f%%",
+            self._attr_native_value,
+            value,
+        )
         self._attr_native_value = value
         self.async_write_ha_state()
 
@@ -98,6 +103,10 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
             car_stopped = bs.chargingStatus is None or float(bs.chargingStatus) == 0
             timed_out = datetime.now(UTC) - self._stop_requested_at > STOP_COMMAND_TIMEOUT
             if car_stopped:
+                _LOGGER.debug(
+                    "Car confirmed charge stopped (chargingStatus=%s)",
+                    bs.chargingStatus,
+                )
                 self._stop_requested_at = None
             elif timed_out:
                 _LOGGER.warning(
@@ -106,15 +115,39 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
                 )
                 self._stop_requested_at = None
             else:
+                _LOGGER.debug(
+                    "Waiting for car to acknowledge charge stop "
+                    "(battery=%s%%, charging=%s, elapsed=%s)",
+                    bs.batteryLevel,
+                    bs.chargingStatus,
+                    datetime.now(UTC) - self._stop_requested_at,
+                )
                 return  # still waiting for the car to acknowledge
 
-        if (
-            bs.plugStatus == 1                       # cable connected
+        is_charging = (
+            bs.plugStatus == 1
             and bs.chargingStatus is not None
-            and float(bs.chargingStatus) > 0         # actively charging
+            and float(bs.chargingStatus) > 0
+        )
+
+        if is_charging:
+            _LOGGER.debug(
+                "Charge limit check: battery=%s%%, limit=%s%%, chargingStatus=%s",
+                bs.batteryLevel,
+                self._attr_native_value,
+                bs.chargingStatus,
+            )
+
+        if (
+            is_charging
             and bs.batteryLevel is not None
             and bs.batteryLevel >= self._attr_native_value
         ):
+            _LOGGER.warning(
+                "Battery level %s%% reached charge limit %s%% — sending charge stop",
+                bs.batteryLevel,
+                self._attr_native_value,
+            )
             self._stop_requested_at = datetime.now(UTC)
             self.hass.async_create_task(
                 self.coordinator.async_charge_stop(),
