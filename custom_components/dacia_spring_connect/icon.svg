@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="128" fill="#1a1a2e"/>
+
+  <!-- Car body silhouette (simplified hatchback / Dacia Spring profile) -->
+  <!-- Main body -->
+  <path d="M44 158
+    C44 158 52 140 72 132
+    C88 124 108 120 128 120
+    C148 120 168 124 184 132
+    C204 140 212 158 212 158
+    L212 172
+    C212 176 208 178 204 178
+    L190 178
+    C190 178 188 164 172 164
+    C156 164 154 178 154 178
+    L102 178
+    C102 178 100 164 84 164
+    C68 164 66 178 66 178
+    L52 178
+    C48 178 44 176 44 172
+    Z"
+    fill="#e8e8e8"/>
+
+  <!-- Roofline / cabin -->
+  <path d="M88 132
+    C94 114 104 108 128 108
+    C152 108 162 114 168 132
+    Z"
+    fill="#c8c8c8"/>
+
+  <!-- Windshield -->
+  <path d="M100 132
+    C104 118 114 112 128 112
+    C142 112 152 118 156 132
+    Z"
+    fill="#4fc3f7" opacity="0.7"/>
+
+  <!-- Left wheel -->
+  <circle cx="84" cy="178" r="16" fill="#333"/>
+  <circle cx="84" cy="178" r="8" fill="#888"/>
+  <circle cx="84" cy="178" r="3" fill="#333"/>
+
+  <!-- Right wheel -->
+  <circle cx="172" cy="178" r="16" fill="#333"/>
+  <circle cx="172" cy="178" r="8" fill="#888"/>
+  <circle cx="172" cy="178" r="3" fill="#333"/>
+
+  <!-- Lightning bolt (electric / EV symbol) — centred on bonnet area -->
+  <polygon points="136,72 118,104 130,104 120,136 142,100 130,100"
+           fill="#f9d71c" stroke="#f9a825" stroke-width="1.5"/>
+</svg>

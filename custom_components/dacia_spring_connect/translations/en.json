@@ -2,48 +2,62 @@
     "config": {
         "step": {
             "user": {
-                "title": "Dacia Spring Connect — Renault Account",
+                "title": "Dacia Spring Connect — Sign In",
+                "description": "Enter the credentials you use for the MyRenault or MyDacia app.",
                 "data": {
-                    "username": "Email address",
+                    "username": "Email Address",
                     "password": "Password",
-                    "locale": "Locale"
+                    "locale": "Country / Region"
+                },
+                "data_description": {
+                    "username": "The email address registered to your MyRenault or MyDacia account.",
+                    "password": "Your MyRenault / MyDacia account password.",
+                    "locale": "Select the country where your vehicle is registered. This determines the Renault API endpoint used."
                 }
             },
             "account": {
-                "title": "Select Kamereon Account",
+                "title": "Select Account",
+                "description": "The following Kamereon accounts are linked to your credentials. Select the one associated with your Dacia Spring.",
                 "data": {
-                    "account_id": "Account"
+                    "account_id": "Kamereon Account"
+                },
+                "data_description": {
+                    "account_id": "Usually named after your name or email address."
                 }
             },
             "vehicle": {
                 "title": "Select Vehicle",
+                "description": "The following vehicles were found in your account. Select your Dacia Spring.",
                 "data": {
                     "vin": "Vehicle (VIN)"
+                },
+                "data_description": {
+                    "vin": "The Vehicle Identification Number (VIN) uniquely identifies your car."
+                }
+            },
+            "reauth_confirm": {
+                "title": "Re-authenticate Dacia Spring Connect",
+                "description": "Your session has expired or your credentials have changed. Please sign in again to restore access.",
+                "data": {
+                    "username": "Email Address",
+                    "password": "Password"
+                },
+                "data_description": {
+                    "username": "The email address registered to your MyRenault or MyDacia account.",
+                    "password": "Your MyRenault / MyDacia account password."
                 }
             }
         },
         "error": {
-            "cannot_connect": "Cannot connect to Renault API. Check your credentials.",
-            "no_accounts": "No Kamereon accounts found.",
+            "cannot_connect": "Cannot connect to the Renault API. Please check your internet connection and try again.",
+            "invalid_auth": "Invalid email address or password. Please verify your MyRenault / MyDacia credentials.",
+            "no_accounts": "No Kamereon accounts found for these credentials.",
             "no_vehicles": "No vehicles found in this account.",
-            "unknown": "Unexpected error. Please check the logs."
+            "unknown": "An unexpected error occurred. Please check the Home Assistant logs for details."
         },
         "abort": {
             "already_configured": "This vehicle is already configured.",
             "reauth_successful": "Re-authentication was successful."
-        },
-        "step": {
-            "reauth_confirm": {
-                "title": "Re-authenticate Dacia Spring Connect",
-                "description": "Your Renault account credentials are no longer valid. Please enter them again.",
-                "data": {
-                    "username": "Email address",
-                    "password": "Password"
-                }
-            }
-        },
-        "error": {
-            "invalid_auth": "Invalid email address or password."
         }
     },
     "options": {

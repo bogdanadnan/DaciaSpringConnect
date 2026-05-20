@@ -2,48 +2,62 @@
     "config": {
         "step": {
             "user": {
-                "title": "Dacia Spring Connect — Compte Renault",
+                "title": "Dacia Spring Connect — Connexion",
+                "description": "Saisissez les identifiants que vous utilisez pour l'application MyRenault ou MyDacia.",
                 "data": {
                     "username": "Adresse e-mail",
                     "password": "Mot de passe",
-                    "locale": "Locale"
+                    "locale": "Pays / Région"
+                },
+                "data_description": {
+                    "username": "L'adresse e-mail associée à votre compte MyRenault ou MyDacia.",
+                    "password": "Le mot de passe de votre compte MyRenault / MyDacia.",
+                    "locale": "Sélectionnez le pays où votre véhicule est enregistré. Cela détermine le point d'accès API Renault utilisé."
                 }
             },
             "account": {
-                "title": "Sélectionnez le compte Kamereon",
+                "title": "Sélectionnez le compte",
+                "description": "Les comptes Kamereon suivants sont liés à vos identifiants. Sélectionnez celui associé à votre Dacia Spring.",
                 "data": {
-                    "account_id": "Compte"
+                    "account_id": "Compte Kamereon"
+                },
+                "data_description": {
+                    "account_id": "Généralement nommé d'après votre nom ou adresse e-mail."
                 }
             },
             "vehicle": {
                 "title": "Sélectionnez le véhicule",
+                "description": "Les véhicules suivants ont été trouvés dans votre compte. Sélectionnez votre Dacia Spring.",
                 "data": {
                     "vin": "Véhicule (VIN)"
+                },
+                "data_description": {
+                    "vin": "Le numéro d'identification du véhicule (VIN) identifie votre voiture de façon unique."
+                }
+            },
+            "reauth_confirm": {
+                "title": "Ré-authentification Dacia Spring Connect",
+                "description": "Votre session a expiré ou vos identifiants ont changé. Veuillez vous reconnecter pour rétablir l'accès.",
+                "data": {
+                    "username": "Adresse e-mail",
+                    "password": "Mot de passe"
+                },
+                "data_description": {
+                    "username": "L'adresse e-mail associée à votre compte MyRenault ou MyDacia.",
+                    "password": "Le mot de passe de votre compte MyRenault / MyDacia."
                 }
             }
         },
         "error": {
-            "cannot_connect": "Impossible de se connecter à l'API Renault. Vérifiez vos identifiants.",
-            "no_accounts": "Aucun compte Kamereon trouvé.",
+            "cannot_connect": "Impossible de se connecter à l'API Renault. Vérifiez votre connexion internet et réessayez.",
+            "invalid_auth": "Adresse e-mail ou mot de passe incorrect. Vérifiez vos identifiants MyRenault / MyDacia.",
+            "no_accounts": "Aucun compte Kamereon trouvé pour ces identifiants.",
             "no_vehicles": "Aucun véhicule trouvé dans ce compte.",
-            "unknown": "Erreur inattendue. Consultez les journaux."
+            "unknown": "Une erreur inattendue s'est produite. Consultez les journaux de Home Assistant pour plus de détails."
         },
         "abort": {
             "already_configured": "Ce véhicule est déjà configuré.",
             "reauth_successful": "La ré-authentification a réussi."
-        },
-        "step": {
-            "reauth_confirm": {
-                "title": "Ré-authentification Dacia Spring Connect",
-                "description": "Vos identifiants de compte Renault ne sont plus valides. Veuillez les saisir à nouveau.",
-                "data": {
-                    "username": "Adresse e-mail",
-                    "password": "Mot de passe"
-                }
-            }
-        },
-        "error": {
-            "invalid_auth": "Adresse e-mail ou mot de passe incorrect."
         }
     },
     "options": {
