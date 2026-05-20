@@ -1,0 +1,147 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Dacia Spring Connect — Renault Account",
+                "data": {
+                    "username": "Email address",
+                    "password": "Password",
+                    "locale": "Locale (e.g. fr_FR, en_GB)"
+                }
+            },
+            "account": {
+                "title": "Select Kamereon Account",
+                "data": {
+                    "account_id": "Account"
+                }
+            },
+            "vehicle": {
+                "title": "Select Vehicle",
+                "data": {
+                    "vin": "Vehicle (VIN)"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Cannot connect to Renault API. Check your credentials.",
+            "no_accounts": "No Kamereon accounts found.",
+            "no_vehicles": "No vehicles found in this account.",
+            "unknown": "Unexpected error. Please check the logs."
+        },
+        "abort": {
+            "already_configured": "This vehicle is already configured.",
+            "reauth_successful": "Re-authentication was successful."
+        },
+        "step": {
+            "reauth_confirm": {
+                "title": "Re-authenticate Dacia Spring Connect",
+                "description": "Your Renault account credentials are no longer valid. Please enter them again.",
+                "data": {
+                    "username": "Email address",
+                    "password": "Password"
+                }
+            }
+        },
+        "error": {
+            "invalid_auth": "Invalid email address or password."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Dacia Spring Connect Options",
+                "data": {
+                    "scan_interval": "Polling interval (seconds)"
+                },
+                "data_description": {
+                    "scan_interval": "How often to fetch data from the Renault API. Minimum 30 seconds."
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "battery_level": {
+                "name": "Battery Level"
+            },
+            "battery_autonomy": {
+                "name": "Battery Autonomy"
+            },
+            "battery_available_energy": {
+                "name": "Available Energy"
+            },
+            "charging_power": {
+                "name": "Charging Power"
+            },
+            "charging_remaining_time": {
+                "name": "Charging Remaining Time"
+            },
+            "charge_status": {
+                "name": "Charge Status",
+                "state": {
+                    "not_in_charge": "Not charging",
+                    "waiting_for_planned_charge": "Waiting for planned charge",
+                    "charge_ended": "Charge ended",
+                    "waiting_for_current_charge": "Waiting for charge",
+                    "energy_flap_opened": "Energy flap opened",
+                    "charge_in_progress": "Charging",
+                    "charge_error": "Charge error",
+                    "unavailable": "Unavailable"
+                }
+            },
+            "hvac_exterior_temperature": {
+                "name": "Exterior Temperature"
+            },
+            "mileage": {
+                "name": "Mileage"
+            }
+        },
+        "binary_sensor": {
+            "plugged_in": {
+                "name": "Plugged In"
+            },
+            "charging": {
+                "name": "Charging"
+            },
+            "hvac_active": {
+                "name": "Pre-conditioning Active"
+            }
+        },
+        "climate": {
+            "hvac": {
+                "name": "Pre-conditioning"
+            }
+        },
+        "device_tracker": {
+            "location": {
+                "name": "Location"
+            }
+        },
+        "number": {
+            "charge_limit": {
+                "name": "Charge Limit"
+            }
+        },
+        "select": {
+            "charge_mode": {
+                "name": "Charge Mode",
+                "state": {
+                    "always": "Always",
+                    "always_charging": "Always charging",
+                    "schedule_mode": "Schedule"
+                }
+            }
+        },
+        "button": {
+            "charge_start": {
+                "name": "Start Charging"
+            },
+            "charge_stop": {
+                "name": "Stop Charging"
+            },
+            "refresh_location": {
+                "name": "Refresh Location"
+            }
+        }
+    }
+}

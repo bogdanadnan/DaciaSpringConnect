@@ -1,0 +1,17 @@
+{
+    "name": "Dacia Spring Connect",
+    "render_readme": true,
+    "domains": [
+        "sensor",
+        "binary_sensor",
+        "climate",
+        "device_tracker",
+        "select",
+        "button"
+    ],
+    "iot_standards": [
+        "zigbee",
+        "zwave"
+    ],
+    "homeassistant": "2024.1.0"
+}

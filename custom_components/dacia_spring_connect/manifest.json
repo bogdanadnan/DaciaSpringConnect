@@ -1,0 +1,17 @@
+{
+    "domain": "dacia_spring_connect",
+    "name": "Dacia Spring Connect",
+    "codeowners": [
+        "@bogdanadnan"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/bogdanadnan/daciaspring",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/bogdanadnan/daciaspring/issues",
+    "requirements": [
+        "renault-api==0.5.9"
+    ],
+    "dependencies": [],
+    "after_dependencies": [],
+    "version": "1.0.0"
+}

@@ -1,0 +1,26 @@
+{
+    // DevContainer for Home Assistant custom component development
+    "name": "Dacia Spring Connect HA Integration Dev",
+    "image": "ghcr.io/ludeeus/devcontainer/homeassistant:latest",
+    "postCreateCommand": "pip install -e '.[dev]'",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.mypy-type-checker",
+                "charliermarsh.ruff"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "editor.formatOnSave": true,
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff"
+                }
+            }
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder}/custom_components,target=/workspaces/homeassistant/config/custom_components,type=bind"
+    ]
+}
