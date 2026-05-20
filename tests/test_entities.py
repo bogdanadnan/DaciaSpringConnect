@@ -273,3 +273,85 @@ async def test_charge_limit_retries_after_timeout(
         await hass.async_block_till_done()
         # Timeout expired → warning logged → stop retried
         assert mock_vehicle.set_charge_stop.await_count == 2
+
+
+async def test_charge_limit_raise_restarts_charging(
+    hass: HomeAssistant, setup_integration, mock_vehicle
+):
+    """Raising the limit while the car is stopped-at-limit restarts charging automatically."""
+    entry_id = setup_integration.entry_id
+    coordinator = hass.data[DOMAIN][entry_id][DATA_COORDINATOR]
+
+    battery_mock = mock_vehicle.get_battery_status.return_value
+    battery_mock.batteryLevel = 80  # at the default 80% limit
+    battery_mock.plugStatus = 1
+    battery_mock.chargingStatus = 1.0
+
+    # First refresh: 80 >= 80 limit → stop issued
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+    assert mock_vehicle.set_charge_stop.await_count == 1
+
+    # Car confirms it stopped
+    battery_mock.chargingStatus = 0.0
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+
+    # User raises limit to 90 — battery (80) is now below new limit while cable
+    # is connected and car is stopped → integration should restart charging
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {
+            "entity_id": f"number.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charge_limit",
+            "value": 90,
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+    mock_vehicle.set_charge_start.assert_awaited_once()
+
+
+async def test_charge_limit_raise_no_restart_when_already_charging(
+    hass: HomeAssistant, setup_integration, mock_vehicle
+):
+    """Raising the limit while the car is already charging should NOT send a start command."""
+    battery_mock = mock_vehicle.get_battery_status.return_value
+    battery_mock.batteryLevel = 70
+    battery_mock.plugStatus = 1
+    battery_mock.chargingStatus = 1.0  # already charging
+
+    # Limit raised from 80 to 90 — car is already charging, no start needed
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {
+            "entity_id": f"number.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charge_limit",
+            "value": 90,
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+    mock_vehicle.set_charge_start.assert_not_awaited()
+
+
+async def test_charge_limit_raise_no_restart_when_unplugged(
+    hass: HomeAssistant, setup_integration, mock_vehicle
+):
+    """Raising the limit while the cable is unplugged should NOT send a start command."""
+    battery_mock = mock_vehicle.get_battery_status.return_value
+    battery_mock.batteryLevel = 70
+    battery_mock.plugStatus = 0  # unplugged
+    battery_mock.chargingStatus = 0.0
+
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {
+            "entity_id": f"number.dacia_spring_connect_{MOCK_VIN[-4:].lower()}_charge_limit",
+            "value": 90,
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+    mock_vehicle.set_charge_start.assert_not_awaited()

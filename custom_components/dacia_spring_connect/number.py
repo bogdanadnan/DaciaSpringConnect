@@ -75,14 +75,53 @@ class DaciaSpringConnectChargeLimit(DaciaSpringConnectEntity, NumberEntity, Rest
         )
 
     async def async_set_native_value(self, value: float) -> None:
-        """Update the configured charge limit."""
+        """Update the configured charge limit.
+
+        If the new limit is raised above the current battery level while the
+        cable is still plugged in and charging is stopped (because this
+        integration previously stopped it), automatically restart charging.
+        """
+        old_limit = self._attr_native_value
         _LOGGER.debug(
             "Charge limit updated: %.0f%% → %.0f%%",
-            self._attr_native_value,
+            old_limit,
             value,
         )
         self._attr_native_value = value
         self.async_write_ha_state()
+
+        # If the user raises the limit above the current battery level while the
+        # car is plugged in but not charging, restart charging automatically.
+        data = self.coordinator.data
+        if not (data and data.battery_status):
+            return
+        bs = data.battery_status
+        cable_plugged = bs.plugStatus == 1
+        currently_charging = (
+            bs.chargingStatus is not None and float(bs.chargingStatus) > 0
+        )
+        battery_below_new_limit = (
+            bs.batteryLevel is not None and bs.batteryLevel < value
+        )
+        limit_was_raised = value > old_limit
+
+        if (
+            limit_was_raised
+            and cable_plugged
+            and not currently_charging
+            and battery_below_new_limit
+        ):
+            # Clear any pending stop-acknowledgment flag — user explicitly
+            # overrode the limit, so previous stop state is no longer relevant.
+            self._stop_requested_at = None
+            _LOGGER.warning(
+                "Charge limit raised from %.0f%% to %.0f%% "
+                "while battery is at %s%% and cable is connected — restarting charging",
+                old_limit,
+                value,
+                bs.batteryLevel,
+            )
+            await self.coordinator.async_charge_start()
 
     @callback
     def _async_enforce_charge_limit(self) -> None:
