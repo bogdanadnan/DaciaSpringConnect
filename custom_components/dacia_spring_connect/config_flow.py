@@ -72,7 +72,7 @@ class DaciaSpringConnectConfigFlow(ConfigFlow, domain=DOMAIN):
             self._locale = user_input.get(CONF_LOCALE, DEFAULT_LOCALE).strip()
 
             try:
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "Attempting login: username=%r, locale=%r, password_len=%d, "
                     "password_first=%r, password_last=%r",
                     self._username,
